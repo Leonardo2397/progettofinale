@@ -6,8 +6,10 @@ import org.springframework.security.core.userdetails.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface TourRepository extends JpaRepository<Tour, Long> {
+    Optional<Tour> findByName(String name);
     List<Tour> findByGuide (User guide);
     List<Tour> findByDate (LocalDateTime date);
     List<Tour> findByDifficulty (String difficulty);
