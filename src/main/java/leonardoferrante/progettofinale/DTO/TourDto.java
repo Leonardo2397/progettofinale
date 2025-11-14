@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class TourDto {
     private Long id;
     private String name;
+    private String description;
     private String difficulty;
     private double price;
     private int duration;

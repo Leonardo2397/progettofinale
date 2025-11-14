@@ -50,6 +50,10 @@ public class Tour {
     @NotBlank
     private String startLocation;
 
+    @NotBlank
+    private String imageUrl;
+
+
     //relazione many to one con gli user(guida)
     @ManyToOne(fetch =FetchType.LAZY)
     @JoinColumn(name = "guide_id")

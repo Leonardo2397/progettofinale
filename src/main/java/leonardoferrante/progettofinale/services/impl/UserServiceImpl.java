@@ -8,6 +8,7 @@ import leonardoferrante.progettofinale.repository.UserRepository;
 import leonardoferrante.progettofinale.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import leonardoferrante.progettofinale.entities.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public UserResponseDto registerUser(UserRegisterDto dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
@@ -29,7 +33,7 @@ public class UserServiceImpl implements UserService {
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
-                .password(dto.getPassword()) // in futuro useremo BCrypt
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .role(Role.ROLE_USER)
                 .build();
 
