@@ -4,6 +4,7 @@ import leonardoferrante.progettofinale.DTO.TourDto;
 import leonardoferrante.progettofinale.services.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class TourController {
     @Autowired
     private TourService tourService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<TourDto> createTour(@RequestBody TourDto dto) {
         return ResponseEntity.ok(tourService.createTour(dto));
@@ -31,11 +33,13 @@ public class TourController {
         return ResponseEntity.ok(tourService.getAllTours());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<TourDto> updateTour(@PathVariable Long id, @RequestBody TourDto dto) {
         return ResponseEntity.ok(tourService.updateTour(id, dto));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTour(@PathVariable Long id) {
         tourService.deleteTour(id);
