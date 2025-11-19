@@ -25,7 +25,7 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public TourDto createTour(TourDto dto) {
-        User guide = userRepository.findByEmail(dto.getGuideName())
+        User guide = userRepository.findByEmail(dto.getGuideEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Guida non trovata"));
 
         Tour tour = Tour.builder()
@@ -65,7 +65,7 @@ public class TourServiceImpl implements TourService {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tour non trovato"));
 
-        User guide = userRepository.findByEmail(dto.getGuideName())
+        User guide = userRepository.findByEmail(dto.getGuideEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Guida non trovata"));
 
         tour.setName(dto.getName());
@@ -136,7 +136,7 @@ public class TourServiceImpl implements TourService {
                 .date(tour.getDate())
                 .startLocation(tour.getStartLocation())
                 .imageUrl(tour.getImageUrl())
-                .guideName(tour.getGuide().getEmail())
+                .guideEmail(tour.getGuide().getEmail())
                 .build();
     }
 }

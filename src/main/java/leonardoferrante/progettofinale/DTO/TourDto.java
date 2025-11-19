@@ -21,5 +21,5 @@ public class TourDto {
     private LocalDateTime date;
     private String startLocation;
     private String imageUrl;
-    private String guideName;
+    private String guideEmail;
 }
