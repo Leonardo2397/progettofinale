@@ -25,9 +25,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto registerUser(UserRegisterDto dto) {
+        System.out.println("[Register] Arrivato dto: " + dto);
+
         if (userRepository.existsByEmail(dto.getEmail())) {
+            System.out.println(" Email già registrata: " + dto.getEmail());
             throw new IllegalArgumentException("Email già registrata!");
         }
+
+        System.out.println("📌 [REGISTER] Email libera");
+
+        System.out.println("📌 [REGISTER] Provo a criptare la password...");
+        String encrypted = passwordEncoder.encode(dto.getPassword());
+        System.out.println("📌 [REGISTER] Password criptata: " + encrypted);
 
         User user = User.builder()
                 .firstName(dto.getFirstName())
@@ -37,7 +46,13 @@ public class UserServiceImpl implements UserService {
                 .role(Role.ROLE_USER)
                 .build();
 
+
+        System.out.println("📌 [REGISTER] Creo user: " + user);
+
         userRepository.save(user);
+
+        System.out.println("✅ [REGISTER] Utente salvato nel database!");
+
         return mapToResponse(user);
     }
 
