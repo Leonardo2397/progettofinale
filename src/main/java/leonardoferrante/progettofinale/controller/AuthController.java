@@ -8,6 +8,7 @@ import leonardoferrante.progettofinale.DTO.UserRegisterDto;
 import leonardoferrante.progettofinale.entities.User;
 import leonardoferrante.progettofinale.security.JwtUtils;
 import leonardoferrante.progettofinale.services.UserService;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -81,8 +82,21 @@ public class AuthController {
 
         String jwt = jwtUtils.generateJwtToken(user);
 
-        return ResponseEntity.ok(new JwtResponse(jwt, "Bearer", user.getEmail(), user.getRole().name()));
+        // CREA IL COOKIE JWT
+        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                .httpOnly(true)
+                .secure(false) // metti true se usi HTTPS
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity
+                .ok()
+                .header("Set-Cookie", cookie.toString())
+                .body(new JwtResponse(jwt, "Bearer", user.getEmail(), user.getRole().name()));
     }
+
 }
 
 
