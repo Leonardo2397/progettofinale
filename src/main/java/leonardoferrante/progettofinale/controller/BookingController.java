@@ -36,6 +36,13 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getBookingsByUserEmail(email));
     }
 
+    @GetMapping("/user/me")
+    public ResponseEntity<List<BookingDto>> getMyBookings(org.springframework.security.core.Authentication authentication) {
+        String email = authentication.getName(); 
+        return ResponseEntity.ok(bookingService.getBookingsByUserEmail(email));
+    }
+
+
     @GetMapping("/tour/{tourName}")
     public ResponseEntity<List<BookingDto>> getBookingsByTour(@PathVariable String tourName) {
         return ResponseEntity.ok(bookingService.getBookingsByTourName(tourName));

@@ -63,7 +63,7 @@ public class JwtUtils {
     public String generateJwtToken(leonardoferrante.progettofinale.entities.User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .claim("role", user.getRole().name())
+                .claim("role", "ROLE_" + user.getRole().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
