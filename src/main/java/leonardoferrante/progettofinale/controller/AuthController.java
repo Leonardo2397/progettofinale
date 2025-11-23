@@ -31,22 +31,6 @@ public class AuthController {
         this.userService = userService;
     }
 
-//    @PostMapping("/register")
-//    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
-//        try {
-//            userService.registerUser(new UserRegisterDto(
-//                    req.getFirstName(),
-//                    req.getLastName(),
-//                    req.getEmail(),
-//                    req.getPassword()
-//            ));
-//            return ResponseEntity.status(201).body("Utente registrato con successo");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(500).body("Errore nella registrazione: " + e.getMessage());
-//        }
-//    }
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
 
@@ -88,7 +72,7 @@ public class AuthController {
                 .secure(false) // metti true se usi HTTPS
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
 
         return ResponseEntity
