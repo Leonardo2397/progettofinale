@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -70,32 +71,44 @@ public class AuthController {
         }
     }
 
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest loginRequest) {
 
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
+        System.out.println("DEBUG EMAIL: " + loginRequest.getEmail());
+        System.out.println("DEBUG PASSWORD: " + loginRequest.getPassword());
+
+        // 1️⃣ Autenticazione tramite AuthenticationManager
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
         );
 
-        User user = userService.findByEmail(req.getEmail());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // 2️⃣ Recuperiamo l'entità User dal DB tramite UserService
+        User user = userService.getUserByEmail(loginRequest.getEmail());
+        if (user == null) {
+            return ResponseEntity.status(404).body(null); // Utente non trovato (per sicurezza)
+        }
+
+        // 3️⃣ Generiamo JWT usando l'entità User
         String jwt = jwtUtils.generateJwtToken(user);
 
-        // CREA IL COOKIE JWT
-        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
-                .httpOnly(true)
-                .secure(false) // metti true se usi HTTPS
-                .path("/")
-                .maxAge(7 * 24 * 60 * 60)
-                .sameSite("Lax")
-                .build();
+        // 4️⃣ Creiamo la risposta
+        JwtResponse response = new JwtResponse(
+                jwt,
+                "Bearer",
+                user.getEmail(),
+                user.getRole().name()
+        );
 
-        return ResponseEntity
-                .ok()
-                .header("Set-Cookie", cookie.toString())
-                .body(new JwtResponse(jwt, "Bearer", user.getEmail(), user.getRole().name()));
+        return ResponseEntity.ok(response);
     }
+
+
+
 
 }
 

@@ -39,40 +39,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = null;
         String username = null;
 
-        // 1) Prova a prendere il token dall'header
+        // 1. Leggi token
         if (authHeader != null && authHeader.startsWith(prefix)) {
             jwt = authHeader.substring(prefix.length());
         } else {
-            // 2) Se non esiste, prendilo dal cookie
             jwt = getJwtFromCookie(request);
         }
 
-        // 3) Se c'è un token valido → estrae username
+        // 2. Valida token
         if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
             username = jwtUtils.getUsernameFromToken(jwt);
         }
 
-        // 4) Imposta autenticazione nello SecurityContext
+        // 3. Autenticazione
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            String role = jwtUtils.getRoleFromToken(jwt);
 
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            Collections.singleton(new SimpleGrantedAuthority(role))
+                            userDetails.getAuthorities() // <-- USARE RUOLI ORIGINALI!!!!
                     );
 
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Recupera JWT dal cookie (se presente)
+     */
     private String getJwtFromCookie(HttpServletRequest request) {
         if (request.getCookies() == null) return null;
 
@@ -83,5 +84,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
 }
 

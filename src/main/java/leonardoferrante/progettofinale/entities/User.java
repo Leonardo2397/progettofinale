@@ -8,7 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +21,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +39,7 @@ public class User {
     @Size(max = 50)
     private String email;
 
-    @JsonIgnore//salva la password hashata
+    @JsonIgnore
     @NotBlank
     @Size(min = 8, max = 100)
     private String password;
@@ -45,14 +48,52 @@ public class User {
     @Column(length = 20)
     private Role role = Role.ROLE_USER;
 
-    // Relazione con prenotazioni: un utente può avere molte prenotazioni
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<Booking> bookings = new HashSet<>();
 
-    // Se gestisci le guide come utenti con ruolo GUIDe:
-    // una guida può creare/gestire molti tour
     @OneToMany(mappedBy = "guide")
     @JsonIgnore
     private Set<Tour> tours = new HashSet<>();
+
+    // -----------------------------
+    // USERDETAILS IMPLEMENTATION
+    // -----------------------------
+
+    @Override
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Set.of(() -> role.name());
+    }
+
+    @Override
+    @JsonIgnore
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isEnabled() {
+        return true;
+    }
 }
+

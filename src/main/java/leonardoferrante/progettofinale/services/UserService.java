@@ -18,5 +18,6 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    User findByEmail(String email);
+    // Recupera direttamente l'entità User
+    User getUserByEmail(String email);
 }
