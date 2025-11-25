@@ -95,13 +95,11 @@ import leonardoferrante.progettofinale.services.impl.CustomUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -135,39 +133,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("JWT trovato nel cookie: " + jwt);
         }
 
-        // 3) Controllo se il token è valido
-        if (jwt != null) {
-            boolean valid = jwtUtils.validateJwtToken(jwt);
-            System.out.println("Token valido? " + valid);
-
-            if (valid) {
-                username = jwtUtils.getUsernameFromToken(jwt);
-                System.out.println("Username estratto dal token: " + username);
-            }
-        } else {
-            System.out.println("Nessun JWT trovato");
         // 2. Valida token
         if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
             username = jwtUtils.getUsernameFromToken(jwt);
+            System.out.println("Token valido, username: " + username);
+        } else {
+            System.out.println("Token assente o non valido");
         }
 
         // 3. Autenticazione
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            String role = jwtUtils.getRoleFromToken(jwt);
-            System.out.println("Ruolo estratto: " + role);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities() // <-- USARE RUOLI ORIGINALI!!!!
+                            userDetails.getAuthorities()
                     );
 
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
             SecurityContextHolder.getContext().setAuthentication(authToken);
+
+            System.out.println("Utente autenticato: " + username);
         }
 
         filterChain.doFilter(request, response);
@@ -186,5 +175,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
 }
+
