@@ -1,5 +1,6 @@
 package leonardoferrante.progettofinale.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import leonardoferrante.progettofinale.DTO.JwtResponse;
 import leonardoferrante.progettofinale.DTO.LoginRequest;
@@ -99,10 +100,24 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
 
+        String jwt = jwtUtils.getJwtFromCookies(request);
+        if(jwt == null || !jwtUtils.validateJwtToken(jwt)) {
+            return ResponseEntity.status(401).body("TOken non valido");
+        }
 
+        String email = jwtUtils.getUsernameFromToken(jwt);
+        User user = userService.getUserByEmail(email);
 
+        return ResponseEntity.ok(new JwtResponse(
+                null,
+                "Bearer",
+                user.getEmail(),
+                user.getRole().name()
+        ));
+    }
 }
 
 

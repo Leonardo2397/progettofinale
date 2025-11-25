@@ -1,6 +1,7 @@
 package leonardoferrante.progettofinale.security;
 
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
 import leonardoferrante.progettofinale.entities.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -51,4 +52,16 @@ public class JwtUtils {
             return false;
         }
     }
+
+    public String getJwtFromCookies(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+
+        for(var cookie : request.getCookies()) {
+            if("jwt".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
 }
