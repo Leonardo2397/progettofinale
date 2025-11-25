@@ -9,6 +9,7 @@ import leonardoferrante.progettofinale.DTO.UserRegisterDto;
 import leonardoferrante.progettofinale.entities.User;
 import leonardoferrante.progettofinale.security.JwtUtils;
 import leonardoferrante.progettofinale.services.UserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,37 +60,34 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest loginRequest) {
 
-        System.out.println("DEBUG EMAIL: " + loginRequest.getEmail());
-        System.out.println("DEBUG PASSWORD: " + loginRequest.getPassword());
-
-        // 1️⃣ Autenticazione tramite AuthenticationManager
+        // Autenticazione
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 2️⃣ Recuperiamo l'entità User dal DB tramite UserService
+        //  Recuperiamo l'utente dal DB
         User user = userService.getUserByEmail(loginRequest.getEmail());
         if (user == null) {
-            return ResponseEntity.status(404).body(null); // Utente non trovato (per sicurezza)
+            return ResponseEntity.status(404).body(null);
         }
 
-        // 3️⃣ Generiamo JWT usando l'entità User
+        //  Generiamo JWT
         String jwt = jwtUtils.generateJwtToken(user);
 
-        // CREA IL COOKIE JWT
+        //  Creiamo cookie compatibile con localhost
         ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
                 .httpOnly(true)
-                .secure(false) // metti true se usi HTTPS
+                .secure(false)       // false per localhost
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60)
-                .sameSite("None")
+                .sameSite("Lax")    // Lax funziona su localhost
                 .build();
-        // 4️⃣ Creiamo la risposta
+
+        // Risposta con cookie e body
         JwtResponse response = new JwtResponse(
                 jwt,
                 "Bearer",
@@ -97,8 +95,12 @@ public class AuthController {
                 user.getRole().name()
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
+
+
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
