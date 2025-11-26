@@ -118,32 +118,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        // 🔥 ESCLUDI TUTTI GLI ENDPOINT DI AUTENTICAZIONE
+        String path = request.getServletPath();
+        if (path.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
         final String prefix = "Bearer ";
 
         String jwt = null;
         String username = null;
 
-        // 1. Leggi token
         if (authHeader != null && authHeader.startsWith(prefix)) {
             jwt = authHeader.substring(prefix.length());
-            System.out.println("JWT trovato nell'header: " + jwt);
         } else {
             jwt = getJwtFromCookie(request);
-            System.out.println("JWT trovato nel cookie: " + jwt);
         }
 
-        // 2. Valida token
         if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
             username = jwtUtils.getUsernameFromToken(jwt);
-            System.out.println("Token valido, username: " + username);
-        } else {
-            System.out.println("Token assente o non valido");
         }
 
-        // 3. Autenticazione
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             UsernamePasswordAuthenticationToken authToken =
@@ -155,12 +153,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            System.out.println("Utente autenticato: " + username);
         }
 
         filterChain.doFilter(request, response);
     }
+
+
 
     /**
      * Recupera JWT dal cookie (se presente)
