@@ -28,7 +28,7 @@ public class UserController {
 
     //trovate tutti gli utenti
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
