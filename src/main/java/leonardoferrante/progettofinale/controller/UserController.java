@@ -3,6 +3,7 @@ package leonardoferrante.progettofinale.controller;
 import jakarta.validation.Valid;
 import leonardoferrante.progettofinale.DTO.UserRegisterDto;
 import leonardoferrante.progettofinale.DTO.UserResponseDto;
+import leonardoferrante.progettofinale.DTO.UserUpdateDto;
 import leonardoferrante.progettofinale.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,6 @@ public class UserController {
 
     //trovate tutti gli utenti
     @GetMapping
-
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
@@ -40,10 +40,17 @@ public class UserController {
     }
 
     //aggiornare un utente
+//    @PutMapping("/{id}")
+//    public ResponseEntity<UserResponseDto> updateUSer(
+//            @PathVariable Long id,
+//            @Valid @RequestBody UserRegisterDto dto) {
+//        return ResponseEntity.ok(userService.updateUser(id, dto));
+//    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUSer(
+    public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable Long id,
-            @Valid @RequestBody UserRegisterDto dto) {
+            @RequestBody UserUpdateDto dto) {
         return ResponseEntity.ok(userService.updateUser(id, dto));
     }
 

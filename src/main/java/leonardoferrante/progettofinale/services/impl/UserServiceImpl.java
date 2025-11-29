@@ -3,13 +3,16 @@ package leonardoferrante.progettofinale.services.impl;
 import jakarta.persistence.EntityNotFoundException;
 import leonardoferrante.progettofinale.DTO.UserRegisterDto;
 import leonardoferrante.progettofinale.DTO.UserResponseDto;
+import leonardoferrante.progettofinale.DTO.UserUpdateDto;
 import leonardoferrante.progettofinale.entities.Role;
 import leonardoferrante.progettofinale.repository.UserRepository;
 import leonardoferrante.progettofinale.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import leonardoferrante.progettofinale.entities.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,19 +74,43 @@ public class UserServiceImpl implements UserService {
         return mapToResponse(user);
     }
 
+//    @Override
+//    public UserResponseDto updateUser(Long id, UserRegisterDto dto) {
+//        User user = userRepository.findById(id)
+//                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
+//
+//
+//        user.setFirstName(dto.getFirstName());
+//        user.setLastName(dto.getLastName());
+//        user.setEmail(dto.getEmail());
+//
+//        userRepository.save(user);
+//        return mapToResponse(user);
+//    }
+
     @Override
-    public UserResponseDto updateUser(Long id, UserRegisterDto dto) {
+    public UserResponseDto updateUser(Long id, UserUpdateDto dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
 
+        if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
+        if (dto.getLastName() != null) user.setLastName(dto.getLastName());
+        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
 
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
+        // Aggiorna il ruolo se fornito (la stringa deve corrispondere a un enum Role)
+        if (dto.getRole() != null && !dto.getRole().isBlank()) {
+            try {
+                user.setRole(Role.valueOf(dto.getRole()));
+            } catch (IllegalArgumentException ex) {
+                // Ruolo non valido -> 400 Bad Request
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ruolo non valido: " + dto.getRole());
+            }
+        }
 
         userRepository.save(user);
         return mapToResponse(user);
     }
+
 
     @Override
     public void deleteUser(Long id) {

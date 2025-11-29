@@ -2,6 +2,7 @@ package leonardoferrante.progettofinale.services;
 
 import leonardoferrante.progettofinale.DTO.UserRegisterDto;
 import leonardoferrante.progettofinale.DTO.UserResponseDto;
+import leonardoferrante.progettofinale.DTO.UserUpdateDto;
 import leonardoferrante.progettofinale.entities.User;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface UserService {
 
     UserResponseDto getUserById(Long id);
 
-    UserResponseDto updateUser(Long id, UserRegisterDto dto);
+    UserResponseDto updateUser(Long id, UserUpdateDto dto);
 
     void deleteUser(Long id);
 
