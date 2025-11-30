@@ -40,13 +40,6 @@ public class UserController {
     }
 
     //aggiornare un utente
-//    @PutMapping("/{id}")
-//    public ResponseEntity<UserResponseDto> updateUSer(
-//            @PathVariable Long id,
-//            @Valid @RequestBody UserRegisterDto dto) {
-//        return ResponseEntity.ok(userService.updateUser(id, dto));
-//    }
-
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable Long id,

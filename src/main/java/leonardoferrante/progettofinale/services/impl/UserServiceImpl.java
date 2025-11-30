@@ -35,11 +35,11 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Email già registrata!");
         }
 
-        System.out.println("📌 [REGISTER] Email libera");
+        System.out.println(" [REGISTER] Email libera");
 
-        System.out.println("📌 [REGISTER] Provo a criptare la password...");
+        System.out.println(" [REGISTER] Provo a criptare la password...");
         String encrypted = passwordEncoder.encode(dto.getPassword());
-        System.out.println("📌 [REGISTER] Password criptata: " + encrypted);
+        System.out.println(" [REGISTER] Password criptata: " + encrypted);
 
         User user = User.builder()
                 .firstName(dto.getFirstName())
@@ -50,11 +50,11 @@ public class UserServiceImpl implements UserService {
                 .build();
 
 
-        System.out.println("📌 [REGISTER] Creo user: " + user);
+        System.out.println(" [REGISTER] Creo user: " + user);
 
         userRepository.save(user);
 
-        System.out.println("✅ [REGISTER] Utente salvato nel database!");
+        System.out.println(" [REGISTER] Utente salvato nel database!");
 
         return mapToResponse(user);
     }
@@ -74,20 +74,6 @@ public class UserServiceImpl implements UserService {
         return mapToResponse(user);
     }
 
-//    @Override
-//    public UserResponseDto updateUser(Long id, UserRegisterDto dto) {
-//        User user = userRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
-//
-//
-//        user.setFirstName(dto.getFirstName());
-//        user.setLastName(dto.getLastName());
-//        user.setEmail(dto.getEmail());
-//
-//        userRepository.save(user);
-//        return mapToResponse(user);
-//    }
-
     @Override
     public UserResponseDto updateUser(Long id, UserUpdateDto dto) {
         User user = userRepository.findById(id)
@@ -97,7 +83,7 @@ public class UserServiceImpl implements UserService {
         if (dto.getLastName() != null) user.setLastName(dto.getLastName());
         if (dto.getEmail() != null) user.setEmail(dto.getEmail());
 
-        // Aggiorna il ruolo se fornito (la stringa deve corrispondere a un enum Role)
+
         if (dto.getRole() != null && !dto.getRole().isBlank()) {
             try {
                 user.setRole(Role.valueOf(dto.getRole()));
